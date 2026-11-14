@@ -1,66 +1,35 @@
- # SecureAuth: Login Authentication System
+# SecureAuth: Login Authentication System
 
 A modern desktop login system built with **Java Swing** and **MySQL**. Users can register, log in, view a personal dashboard and change their password, while administrators can manage all accounts. Passwords are protected with **BCrypt** hashing.
 
-![Java](https://img.shields.io/badge/Java-17%2B-orange)
-![MySQL](https://img.shields.io/badge/MySQL-8.x-blue)
-![Maven](https://img.shields.io/badge/Build-Maven-red)
-![License](https://img.shields.io/badge/License-MIT-green)
+## Overview
 
----
-
-## Table of Contents
-- [Features](#features)
-- [Screenshots](#screenshots)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Usage](#usage)
-- [Security](#security)
-- [Database Schema](#database-schema)
-- [Troubleshooting](#troubleshooting)
-- [Future Scope](#future-scope)
-- [Author](#author)
-
----
+SecureAuth is a mini project that shows how a Java desktop application connects to a database and handles user accounts safely. It has a colourful custom interface, role-based access (user and admin) and a clean package structure that can be reused as the login module of a larger application.
 
 ## Features
 
-- **Registration** with validation (username length, email format, password length, password confirmation)
-- **Secure login** with BCrypt password verification
-- **Show password** option on the login and registration screens
-- **Custom window design**: gradient panels, rounded buttons, hover effects, draggable window with minimize and close buttons
-- **Dashboard** showing role, email, last login time and total registered users
-- **Change password** page that verifies the current password first
-- **Role-based access**: `user` and `admin` roles
-- **Admin panel** to view all users and delete accounts (an admin cannot delete their own account)
-- **Last login tracking** saved in the database
-- **Database settings in a config file**, kept out of the source code and out of Git
-
-## Screenshots
-
-> Put your images in a `docs/screenshots/` folder with these names.
-
-| Login | Register |
-|---|---|
-| ![Login](docs/screenshots/login.png) | ![Register](docs/screenshots/register.png) |
-
-| Dashboard | Settings |
-|---|---|
-| ![Dashboard](docs/screenshots/dashboard.png) | ![Settings](docs/screenshots/settings.png) |
+- Registration with validation (username, email, password and confirm password)
+- Secure login with BCrypt password verification
+- Show password option on login and register screens
+- Custom window with gradient design, minimize and close buttons, and drag to move
+- Dashboard showing role, email, last login time and total registered users
+- Change password page that checks the current password first
+- Role-based access: `user` and `admin`
+- Admin panel to view all users and delete accounts
+- Last login tracking
+- Database settings kept in a config file, outside the source code and Git
 
 ## Tech Stack
 
 | Technology | Purpose |
 |---|---|
-| Java 17+ | Main programming language |
-| Java Swing / AWT | Graphical user interface |
-| FlatLaf 3.5.4 | Modern look and feel |
+| Java 17+ | Programming language |
+| Java Swing | Graphical user interface |
+| FlatLaf | Modern look and feel |
 | MySQL 8 | Database |
-| JDBC (MySQL Connector/J 8.4.0) | Java to MySQL connection |
-| jBCrypt 0.4 | Password hashing |
-| Maven | Build and dependency management |
-| IntelliJ IDEA | Development environment |
+| JDBC (MySQL Connector/J) | Database connection |
+| jBCrypt | Password hashing |
+| Maven | Build and dependencies |
 
 ## Project Structure
 
@@ -68,8 +37,8 @@ A modern desktop login system built with **Java Swing** and **MySQL**. Users can
 src/main
 ├── java
 │   ├── Main.java                 # Entry point
-│   ├── db/DBConnection.java      # Reads db.properties, opens connections
-│   ├── dao/UserDAO.java          # All database operations
+│   ├── db/DBConnection.java      # Database connection
+│   ├── dao/UserDAO.java          # Database operations
 │   ├── model/User.java           # User data class
 │   ├── util/Theme.java           # Colours, fonts, UI helpers
 │   └── ui/
@@ -81,7 +50,7 @@ src/main
 │       ├── GradientPanel.java
 │       └── ModernButton.java
 └── resources
-    ├── db.properties.example     # Template (copy to db.properties)
+    ├── db.properties.example     # Config template
     └── db.properties             # Your real settings (ignored by Git)
 ```
 
@@ -90,17 +59,14 @@ src/main
 ### Prerequisites
 - JDK 17 or newer
 - MySQL Server 8.x and MySQL Workbench
-- IntelliJ IDEA (Maven support is built in)
+- IntelliJ IDEA
 
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/tanmayudaiwal2511/Java-Swing-login-system-with-MySQL.git
-cd Java-Swing-login-system-with-MySQL
 ```
 
 ### 2. Create the database
-Run this in MySQL Workbench:
-
 ```sql
 CREATE DATABASE auth_db;
 USE auth_db;
@@ -116,14 +82,8 @@ CREATE TABLE users (
 );
 ```
 
-### 3. Configure the database connection
-Copy the example file and enter your own MySQL password:
-
-```bash
-cp src/main/resources/db.properties.example src/main/resources/db.properties
-```
-
-On Windows, you can simply copy and rename the file in IntelliJ or File Explorer.
+### 3. Configure the connection
+Copy `src/main/resources/db.properties.example` to `db.properties` and enter your MySQL password:
 
 ```properties
 db.url=jdbc:mysql://localhost:3306/auth_db
@@ -131,64 +91,33 @@ db.user=root
 db.password=your_mysql_password
 ```
 
-`db.properties` is listed in `.gitignore`, so your password is never uploaded.
+### 4. Run
+Open the project in IntelliJ IDEA, let Maven download the dependencies and run `Main.java`.
 
-### 4. Open and run
-1. Open the project in IntelliJ IDEA and let Maven download the dependencies.
-2. Run `Main.java` (`Shift + F10`).
+## Creating an Admin
 
-## Usage
-
-1. Click **Sign up**, create an account and then log in.
-2. Use **Home** to see your account summary and **Settings** to change your password.
-3. To create an admin, register a normal account and then run:
+Register a normal account, then run:
 
 ```sql
 UPDATE users SET role = 'admin' WHERE username = 'your_username';
 ```
 
-Log in again and a **Manage Users** option appears in the sidebar.
+Log in again and the **Manage Users** option appears in the sidebar.
 
 ## Security
 
-- Passwords are hashed with **BCrypt** (with a random salt); plain-text passwords are never stored.
-- All SQL queries use **prepared statements** to prevent SQL injection.
-- Login errors use a general message ("Invalid username or password") so no hint is given about which part was wrong.
-- Database credentials are loaded from `db.properties` and excluded from version control.
-- For real deployments, use a dedicated MySQL user with limited rights instead of `root`.
-
-## Database Schema
-
-| Field | Type | Notes |
-|---|---|---|
-| id | INT | Primary key, auto increment |
-| username | VARCHAR(50) | Unique, not null |
-| password_hash | VARCHAR(100) | BCrypt hash |
-| created_at | TIMESTAMP | Set automatically |
-| email | VARCHAR(100) | Unique |
-| role | VARCHAR(10) | `user` (default) or `admin` |
-| last_login | TIMESTAMP | Updated on each login |
-
-## Troubleshooting
-
-| Problem | Fix |
-|---|---|
-| `Cannot load db.properties` | Make sure the file is in `src/main/resources`, then rebuild the project |
-| `Access denied for user 'root'` | Check the password in `db.properties` |
-| `Unknown database 'auth_db'` | Run the SQL script from step 2 |
-| `Communications link failure` | Start the MySQL server and check port 3306 |
-| `Unknown column 'email'` or `'role'` | Your table is missing columns; recreate it with the script above |
-| Red errors on `BCrypt` or `FlatLaf` imports | Reload Maven changes in IntelliJ |
+- Passwords are hashed with BCrypt and a random salt; plain text is never stored
+- All queries use prepared statements to prevent SQL injection
+- Login errors use a general message so they do not reveal which field was wrong
+- Database credentials are loaded from `db.properties`, which is excluded from Git
 
 ## Future Scope
 
 - Email OTP-based two-factor authentication
 - Forgot password with email reset code
 - Account lockout after repeated failed logins
-- Activity log of logins for admins
-- Admin screen to change user roles and search users
+- Admin activity log and role management screen
 - Profile photo and dark mode
-- Windows installer (`.exe`) using `jpackage`
 
 ## Author
 
